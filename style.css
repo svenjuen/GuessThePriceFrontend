@@ -108,3 +108,27 @@ body {
     background: #e6f7ff;
     font-weight: bold;
 }
+
+/* Verhindert Flackern */
+.item-image, .item-image-guess, .item-image-results {
+  will-change: transform;
+  backface-visibility: hidden;
+  image-rendering: optimizeQuality;
+}
+
+.game-phase {
+  transition: opacity 0.3s ease;
+}
+
+.player-card, .result-row {
+  transition: all 0.2s ease;
+}
+
+#current-guess-display {
+  color: #2c3e50;
+  font-size: 1.1em;
+  min-height: 1.5em;
+  padding: 5px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+}
