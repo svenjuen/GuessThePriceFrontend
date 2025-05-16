@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Multiplayer Guess the Price</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Guess the Price</h1>
+  
+  <div id="join-screen">
+    <h2>Join Game</h2>
+    <input type="text" id="player-name" placeholder="Your name">
+    <button id="join-btn">Join</button>
+  </div>
+  
+  <div id="game-container" style="display: none;">
+    <div id="waiting-phase">
+      <h2>Waiting for game to start...</h2>
+      <div id="players-list"></div>
+      <button id="start-btn">Start Game</button>
+    </div>
+    
+    <div id="showing-phase" style="display: none;">
+      <h2>Study this item:</h2>
+      <img id="item-image" src="" alt="Item to guess">
+      <p id="item-description"></p>
+      <div id="timer">Starting in: 5</div>
+    </div>
+    
+    <div id="guessing-phase" style="display: none;">
+      <h2>How much does this cost?</h2>
+      <img id="item-image-guess" src="" alt="Item to guess">
+      <p id="item-description-guess"></p>
+      <div id="timer-guess">Time remaining: 30</div>
+      <input type="number" id="guess-input" placeholder="Enter price ($)">
+      <button id="submit-guess">Submit Guess</button>
+    </div>
+    
+    <div id="results-phase" style="display: none;">
+      <h2>Results</h2>
+      <img id="item-image-results" src="" alt="Item to guess">
+      <p>Actual price: $<span id="actual-price"></span></p>
+      <div id="results"></div>
+      <div id="timer-results">Next round in: 10</div>
+    </div>
+  </div>
+  
+  <script src="GuessThePrice.js"></script>
+</body>
+</html>
