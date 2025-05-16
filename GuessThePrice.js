@@ -49,6 +49,16 @@ function loadImageIfChanged(imgElement, newSrc) {
   if (imgElement.dataset.currentSrc !== newSrc) {
     imgElement.src = newSrc;
     imgElement.dataset.currentSrc = newSrc;
+    
+    imgElement.onload = function() {
+      // Wieder einblenden mit Animation
+      imgElement.style.transition = 'opacity 0.3s ease';
+      imgElement.style.opacity = '1';
+      
+      // Konsistente Größe erzwingen
+      imgElement.style.width = '300px';
+      imgElement.style.height = '300px';
+    };
   }
 }
 
@@ -58,7 +68,7 @@ function joinGame() {
     alert('Bitte gib einen Namen ein (mind. 2 Zeichen)');
     return;
   }
-
+  
   socket.send(JSON.stringify({
     type: 'join',
     name: name
@@ -71,15 +81,15 @@ function submitPlayerGuess() {
     alert('Bitte gib einen Preis ein');
     return;
   }
-
+  
   // Aktuellen Guess anzeigen
   currentGuessDisplay.textContent = `Aktuelle Schätzung: $${parseFloat(guess).toFixed(2)}`;
-
+  
   socket.send(JSON.stringify({
     type: 'guess',
     guess: parseFloat(guess)
   }));
-
+  
   submitGuess.disabled = true;
 }
 
@@ -93,23 +103,23 @@ guessInput.addEventListener('keypress', (e) => {
 // WebSocket handler
 socket.addEventListener('message', (event) => {
   const data = JSON.parse(event.data);
-
+  
   switch (data.type) {
     case 'welcome':
       playerId = data.playerId;
       joinScreen.style.display = 'none';
       gameContainer.style.display = 'block';
       break;
-
+      
     case 'players':
       updatePlayersList(data.players);
       break;
-
+      
     case 'update':
       currentGameState = data.gameState;
       smoothUpdateGame();
       break;
-
+      
     case 'timerUpdate': // Nur für Timer-Updates
       if (currentGameState) {
         currentGameState.timeRemaining = data.timeRemaining;
@@ -121,20 +131,20 @@ socket.addEventListener('message', (event) => {
 
 function updatePlayersList(players) {
   playersList.innerHTML = '';
-
+  
   players.forEach(player => {
     const playerCard = document.createElement('div');
     playerCard.className = 'player-card';
-
+    
     if (player.id === playerId) {
       playerCard.style.border = '2px solid #3498db';
     }
-
+    
     playerCard.innerHTML = `
       <div class="player-name">${player.name}</div>
       <div class="player-score">${player.score} pts</div>
     `;
-
+    
     playersList.appendChild(playerCard);
   });
 }
@@ -164,26 +174,18 @@ function smoothUpdateGame() {
         loadImageIfChanged(itemImage, `images/${currentGameState.currentItem.img}`);
         itemDesc.textContent = currentGameState.currentItem.desc;
         break;
-
+        
       case 'guessing':
         loadImageIfChanged(itemImageGuess, `images/${currentGameState.currentItem.img}`);
         itemDescGuess.textContent = currentGameState.currentItem.desc;
         guessInput.focus();
         submitGuess.disabled = false;
         break;
-
+        
       case 'results':
         loadImageIfChanged(itemImageResults, `images/${currentGameState.currentItem.img}`);
         actualPrice.textContent = currentGameState.currentItem.price.toFixed(2);
         showResults();
-        break;
-
-      case 'guessing':
-        loadImageIfChanged(itemImageGuess, `images/${currentGameState.currentItem.img}`);
-        itemDescGuess.textContent = currentGameState.currentItem.desc;
-        guessInput.focus();
-        submitGuess.disabled = false;
-        currentGuessDisplay.textContent = ''; // Zurücksetzen bei neuer Runde
         break;
     }
   }
@@ -201,28 +203,28 @@ function updateTimers() {
 
 function showResults() {
   if (!currentGameState?.players) return;
-
+  
   const sortedPlayers = [...currentGameState.players].sort((a, b) => {
     if (a.lastDiff === null) return 1;
     if (b.lastDiff === null) return -1;
     return a.lastDiff - b.lastDiff;
   });
-
+  
   resultsDiv.innerHTML = '';
-
+  
   sortedPlayers.forEach((player, index) => {
     if (player.lastDiff === null) return;
-
+    
     const row = document.createElement('div');
     row.className = `result-row ${index === 0 ? 'winner' : ''}`;
-
+    
     row.innerHTML = `
       <span>${player.name}</span>
       <span>Schätzung: $${player.currentGuess.toFixed(2)}</span>
       <span>Differenz: $${player.lastDiff.toFixed(2)}</span>
       <span>+${player.score - (currentGameState.players.find(p => p.id === player.id)?.previousScore || 0)} Punkte</span>
     `;
-
+    
     resultsDiv.appendChild(row);
   });
 }
